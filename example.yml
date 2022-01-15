@@ -1,0 +1,61 @@
+src_elastic:
+  addresses: # A list of Elasticsearch nodes to use.
+    - http://dev-es:9200
+  # username: "elastic" # Username for HTTP Basic Authentication
+  # password: "elastic" # Password for HTTP Basic Authentication
+  # cloudid: "clustername:id" # Endpoint for the Elastic Service (https://elastic.co/cloud)
+  # apikey: "apikey"    # Base64-encoded token for authorization; if set, overridex username/password and service token
+  # servicetoken: "string" # Service token for authorization; if set, overrides username/password
+  # certificatefingerprint: "sha256" # SHA256 hex fingerprint given by Elasticsearch on first launch.
+
+  # header: {} # Additional headers to include in the request
+
+
+  # retryonstatus: # List of status codes for retry
+  #   - 502
+  #   - 503
+  #   - 504
+  # disableretry: False # Disables retry
+  # enableretryontimeout: False # Enable retry on timeout errors
+  # maxretries: 3 # Number of retries before giving up.
+
+  # compressrequestbody: false # Enable compression of request body
+  # discovernodesonstart: false # Discover additional nodes when initalizing the client.
+  # discovernodesinterval: 10s
+
+  # enablemetrics: false # Enable the collection of metrics
+  # enabledebuglogger: false # Enable debug logging
+  # enablecompatibilitymode: false # Enables compatibility header
+
+  # disablemetaheader: false # Disables the additional "X-Elastic-Client-Meta" HTTP header.
+  # useresponsecheckonly: false
+dst_elastic:
+  addresses: # A list of Elasticsearch nodes to use.
+    - http://prod-es:9201
+  # username: "elastic" # Username for HTTP Basic Authentication
+  # password: "elastic" # Password for HTTP Basic Authentication
+  # cloudid: "clustername:id" # Endpoint for the Elastic Service (https://elastic.co/cloud)
+  # apikey: "apikey"    # Base64-encoded token for authorization; if set, overridex username/password and service token
+  # servicetoken: "string" # Service token for authorization; if set, overrides username/password
+  # certificatefingerprint: "sha256" # SHA256 hex fingerprint given by Elasticsearch on first launch.
+
+  # header: {} # Additional headers to include in the request
+
+  # retryonstatus: # List of status codes for retry
+  #   - 502
+  #   - 503
+  #   - 504
+  # disableretry: False # Disables retry
+  # enableretryontimeout: False # Enable retry on timeout errors
+  # maxretries: 3 # Number of retries before giving up.
+
+  # compressrequestbody: false # Enable compression of request body
+  # discovernodesonstart: false # Discover additional nodes when initalizing the client.
+  # discovernodesinterval: 10s
+
+  # enablemetrics: false # Enable the collection of metrics
+  # enabledebuglogger: false # Enable debug logging
+  # enablecompatibilitymode: false # Enables compatibility header
+
+  # disablemetaheader: false # Disables the additional "X-Elastic-Client-Meta" HTTP header.
+  # useresponsecheckonly: false
