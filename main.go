@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/elastic/go-elasticsearch/v7"
+	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
 )
 
@@ -25,6 +26,10 @@ type sync_conf struct {
 // Funcs
 func main() {
 	var config sync_conf
+	app := cli.NewApp()
+	app.Name = "elastiSync"
+
+	// Config parsing
 	conf_cont, err := os.ReadFile("config.yml")
 	handleErr(err)
 	err = yaml.Unmarshal(conf_cont, &config)
