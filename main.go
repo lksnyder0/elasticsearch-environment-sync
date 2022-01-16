@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"os"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/elastic/go-elasticsearch/v7"
+	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
 )
 
@@ -24,21 +26,46 @@ type sync_conf struct {
 
 // Funcs
 func main() {
-	var config sync_conf
-	conf_cont, err := os.ReadFile("config.yml")
-	handleErr(err)
-	err = yaml.Unmarshal(conf_cont, &config)
-	handleErr(err)
-	log.Printf("Connecting to source cluster at: %s", config.Src_elastic.Addresses)
+	app := cli.NewApp()
+	app.Name = "elastiSync"
+	app.Usage = "Sync configuration objects between elasticsearch clusters."
 
-	src_es, err := elasticsearch.NewClient(config.Src_elastic)
-	handleErr(err)
-	src_info := getClusterInfo(*src_es)
-	logNameAndInfo(src_info)
-	dst_es, err := elasticsearch.NewClient(config.Dst_elastic)
-	handleErr(err)
-	dst_info := getClusterInfo(*dst_es)
-	logNameAndInfo(dst_info)
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "config, c",
+			Value: "config.yml",
+			Usage: "Load configuration from `FILE`",
+		},
+		cli.BoolFlag{
+			Name:  "verbose, v",
+			Usage: "Enable debug logging",
+		},
+		cli.BoolFlag{
+			Name:  "quiet, q",
+			Usage: "Error logging only",
+		},
+	}
+
+	app.Action = func(c *cli.Context) error {
+		if c.Bool("verbose") && c.Bool("quiet") {
+			log.Fatal("--verbose and --quiet are mutually exclusive")
+		} else if c.Bool("verbose") {
+			log.SetLevel(log.DebugLevel)
+		} else if c.Bool("quiet") {
+			log.SetLevel(log.ErrorLevel)
+		} else {
+			log.SetLevel(log.InfoLevel)
+		}
+		config := getConfigObj(c.String("config"))
+		_, _ = getElasticClient(config.Src_elastic)
+		_, _ = getElasticClient(config.Dst_elastic)
+		return nil
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func handleErr(err error) {
@@ -46,6 +73,25 @@ func handleErr(err error) {
 		log.Fatalf("%s", err)
 		os.Exit(1)
 	}
+}
+
+func getConfigObj(path string) sync_conf {
+	var config sync_conf
+	// Config parsing
+	conf_cont, err := os.ReadFile(path)
+	handleErr(err)
+	err = yaml.Unmarshal(conf_cont, &config)
+	handleErr(err)
+
+	return config
+}
+
+func getElasticClient(conf elasticsearch.Config) (*elasticsearch.Client, map[string]interface{}) {
+	es, err := elasticsearch.NewClient(conf)
+	handleErr(err)
+	es_info := getClusterInfo(*es)
+	logNameAndInfo(es_info)
+	return es, es_info
 }
 
 func getClusterInfo(es elasticsearch.Client) map[string]interface{} {
@@ -58,5 +104,5 @@ func getClusterInfo(es elasticsearch.Client) map[string]interface{} {
 }
 
 func logNameAndInfo(c_info map[string]interface{}) {
-	log.Printf("Successfully connnected to %s", c_info["cluster_name"])
+	log.Infof("Successfully connnected to %s", c_info["cluster_name"])
 }
