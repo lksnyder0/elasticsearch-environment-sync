@@ -1,8 +1,6 @@
 build:
-	mkdir -p bin
 	go mod tidy
-	go build -o bin/elastiSync main.go
+	go build -o bin/
 
 clean:
 	go clean
-	rm -rf bin

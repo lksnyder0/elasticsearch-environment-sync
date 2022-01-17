@@ -1,13 +1,19 @@
 language: go
+dist: "focal"
+os:
+  - "linux"
+  - "windows"
 go:
 - '1.17'
 deploy:
   provider: releases
   api_key:
     secure: oKYu48p4O01PlVQ0VZWNojrGwSIhBcoCDCrZkTdz3GF0/AvVD+92Rcu65oem0JG0qnsjWwHEawN9dQuOgUki+N1/hdwF1BEs2ROQ8PBsfi+/DDeP3uv+iAA39t1lWCO8VVvZIBqEfSsd7uXD+shjmWz+FlIM8NNw7oqPidBjX9v7RsiGAF8C45KlCHR0ZnT27cVe028Yq4GU79YIJewGvOVP9MZMD4C4+4QI10yd0NMNowWbsWfGB+H2K98u4Q2MMcX8Dw26ltcwULhP+D6mfhl2lPyYeUn3f3P0FhIopziUy4W2tt83amPQWlhRhehy18JZLZy7TGAs9BRC9qf2s3yYiGw+KOC9dzORZY1AQg+br4lYsZX8QASJ5DaG9Lq7c9NFrCeul/Z0WcbtSFyqsutNV+fdsXGUCryqkA+UGKcU4vc2LdfksWRwH34+SXlJ2fu1SDx1rEMe9qoKgNqYcHUEzzMa/uWdpNH1aOAAvA2qjcik60GXNjrzpid/UVjCGB4gw9tFa6lBbmNRepPdLhdGQD7/e6gzanbJJnFED92O9175x6YMKU+vikFS7iQzPn9uKrPAqE04y/JM95ByB72mW/i95Z47nebmdOJPGYpMjqNlkm4TMwOIXd4BEJiKJOiD2K8NCEEb3Qx7CVj6mbSDn//gTSzavkwVS8tTwGI=
-  file: bin/elastiSync
+  file:
+    - "bin/elastiSync"
+    - "bin/elastiSync.exe"
   on:
     repo: lksnyder0/elasticsearch-environment-sync
-    branch: "lksnyder0/issue8"
+    branch: "main"
   skip_cleanup: 'true'
   draft: true
