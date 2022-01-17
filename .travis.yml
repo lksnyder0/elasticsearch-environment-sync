@@ -8,9 +8,6 @@ deploy:
   file: bin/elastiSync
   on:
     repo: lksnyder0/elasticsearch-environment-sync
-    branches:
-      only:
-        - main
-        - lksnyder0/issue8
+    branch: "lksnyder0/issue8"
   skip_cleanup: 'true'
   draft: true
