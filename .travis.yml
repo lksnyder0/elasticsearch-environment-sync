@@ -5,6 +5,8 @@ os:
   - "windows"
 go:
 - '1.17'
+install: go mod tidy
+script: go build -o bin/
 deploy:
   provider: releases
   api_key:
