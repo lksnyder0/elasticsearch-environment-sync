@@ -18,10 +18,14 @@ type obj_conf struct {
 	Conf map[string]string
 }
 
+type cluster_config struct {
+	Config elasticsearch.Config
+	Name   string
+}
+
 type sync_conf struct {
-	Src_elastic elasticsearch.Config
-	Dst_elastic elasticsearch.Config
-	Items       []obj_conf
+	Clusters []cluster_config
+	Items    []obj_conf
 }
 
 // Funcs
@@ -36,6 +40,16 @@ func main() {
 			Value: "config.yml",
 			Usage: "Load configuration from `FILE`",
 		},
+		cli.StringFlag{
+			Name:  "src, s",
+			Value: "dev",
+			Usage: "Source cluster to get configuratoin objects from",
+		},
+		cli.StringFlag{
+			Name:  "dst, d",
+			Value: "prod",
+			Usage: "Destination cluster to put updated configuration",
+		},
 		cli.BoolFlag{
 			Name:  "verbose, v",
 			Usage: "Enable debug logging",
@@ -46,26 +60,47 @@ func main() {
 		},
 	}
 
-	app.Action = func(c *cli.Context) error {
-		if c.Bool("verbose") && c.Bool("quiet") {
-			log.Fatal("--verbose and --quiet are mutually exclusive")
-		} else if c.Bool("verbose") {
-			log.SetLevel(log.DebugLevel)
-		} else if c.Bool("quiet") {
-			log.SetLevel(log.ErrorLevel)
-		} else {
-			log.SetLevel(log.InfoLevel)
-		}
-		config := getConfigObj(c.String("config"))
-		_, _ = getElasticClient(config.Src_elastic)
-		_, _ = getElasticClient(config.Dst_elastic)
-		return nil
-	}
+	app.Action = sync
 
 	err := app.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func sync(c *cli.Context) error {
+	if c.Bool("verbose") && c.Bool("quiet") {
+		log.Fatal("--verbose and --quiet are mutually exclusive")
+	} else if c.Bool("verbose") {
+		log.SetLevel(log.DebugLevel)
+	} else if c.Bool("quiet") {
+		log.SetLevel(log.ErrorLevel)
+	} else {
+		log.SetLevel(log.InfoLevel)
+	}
+	config := getConfigObj(c.String("config"))
+	// Get Source configuration
+	for i, s := range config.Clusters {
+		if s.Name == c.String("src") {
+			_, _ = getElasticClient(s.Config)
+			break
+		}
+		if i+1 == len(config.Clusters) {
+			log.Fatalf("Unable to load configuration for environoment %s", c.String("src"))
+		}
+	}
+	// Get destination configuration
+	for i, s := range config.Clusters {
+		if s.Name == c.String("dst") {
+			_, _ = getElasticClient(s.Config)
+			break
+		}
+		if i+1 == len(config.Clusters) {
+			log.Fatalf("Unable to load configuration for environoment %s", c.String("dst"))
+		}
+
+	}
+	return nil
 }
 
 func handleErr(err error) {
