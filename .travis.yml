@@ -16,6 +16,6 @@ deploy:
     - "bin/elastiSync.exe"
   on:
     repo: lksnyder0/elasticsearch-environment-sync
-    branch: "main"
+    tags: true
   skip_cleanup: 'true'
   draft: true
