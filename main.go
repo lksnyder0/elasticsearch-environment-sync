@@ -69,6 +69,8 @@ func main() {
 }
 
 func sync(c *cli.Context) error {
+	var src_es *elasticsearch.Client
+	var dst_es *elasticsearch.Client
 	if c.Bool("verbose") && c.Bool("quiet") {
 		log.Fatal("--verbose and --quiet are mutually exclusive")
 	} else if c.Bool("verbose") {
@@ -82,7 +84,7 @@ func sync(c *cli.Context) error {
 	// Get Source configuration
 	for i, s := range config.Clusters {
 		if s.Name == c.String("src") {
-			_, _ = getElasticClient(s.Config)
+			src_es, _ = getElasticClient(s.Config)
 			break
 		}
 		if i+1 == len(config.Clusters) {
@@ -92,13 +94,23 @@ func sync(c *cli.Context) error {
 	// Get destination configuration
 	for i, s := range config.Clusters {
 		if s.Name == c.String("dst") {
-			_, _ = getElasticClient(s.Config)
+			dst_es, _ = getElasticClient(s.Config)
 			break
 		}
 		if i+1 == len(config.Clusters) {
 			log.Fatalf("Unable to load configuration for environoment %s", c.String("dst"))
 		}
 
+	}
+	// Loop item list
+	for _, s := range config.Items {
+		log.Infof("Syncing %s %s", s.Type, s.Name)
+		switch item_type := s.Type; item_type {
+		case "ilm_policy":
+			syncILM(*src_es, *dst_es, s)
+		default:
+			log.Error("Invalid or unsupported item type %s", item_type)
+		}
 	}
 	return nil
 }
